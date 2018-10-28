@@ -14,7 +14,7 @@
 const char* ssid = "example_1"; // WiFi network name
 const char* password = "example_2"; // WiFi password
 
-#define ORG "example_3"
+#define ORG "example_3" // This is your Org ID, not your Org name.
 #define DEVICE_TYPE "example_4"
 #define DEVICE_ID "example_5"
 #define TOKEN "example_6"
