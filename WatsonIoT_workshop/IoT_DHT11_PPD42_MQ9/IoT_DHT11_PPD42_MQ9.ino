@@ -11,13 +11,13 @@
 #include <ESP8266WiFi.h>
 
 //-------- Customise these values -----------
-const char* ssid = "jaqo";
-const char* password = "comeandgetsome10!";
+const char* ssid = "example_1"; // WiFi network name
+const char* password = "example_2"; // WiFi password
 
-#define ORG "w0xz9w"
-#define DEVICE_TYPE "waterdroid"
-#define DEVICE_ID "ESP_test"
-#define TOKEN "4eFmfb8w6h@5s4rUh*"
+#define ORG "example_3"
+#define DEVICE_TYPE "example_4"
+#define DEVICE_ID "example_5"
+#define TOKEN "example_6"
 
 //-------- Customise the above values --------
 
