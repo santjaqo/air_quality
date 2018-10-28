@@ -5,28 +5,11 @@
  Based on: Ant Elder's code
  License: Only internal use at IBM
 */
-//---------Dust Sensor---------
-int dust_pin = D1;
-unsigned long duration;
-unsigned long starttime;
-unsigned long sampletime_ms = 5000;//sample 30s ;
-unsigned long lowpulseoccupancy = 0;
-float ratio = 0;
-float concentration = 0;
 
-//---------DHT Sensor---------
-#include <DHT.h>
-#define DHTPIN D2
-#define DHTTYPE DHT11
-DHT dht(DHTPIN, DHTTYPE);
-float humidity = 0;
-float temperature = 0;
-float heat_index = 0;
-
-// Start of IoT Settings:____________________________
 #include <PubSubClient.h> // https://github.com/knolleary/pubsubclient/releases/tag/v2.3
 #include <ArduinoJson.h> // https://github.com/bblanchon/ArduinoJson/releases/tag/v5.0.7
 #include <ESP8266WiFi.h>
+
 //-------- Customise these values -----------
 const char* ssid = "jaqo";
 const char* password = "comeandgetsome10!";
@@ -35,12 +18,10 @@ const char* password = "comeandgetsome10!";
 #define DEVICE_TYPE "waterdroid"
 #define DEVICE_ID "ESP_test"
 #define TOKEN "4eFmfb8w6h@5s4rUh*"
-//#define DEVICE_ID "ESP_test_kerem"
-//#define TOKEN "3OTBoanwjTv@Rb_q+q"
-//#define DEVICE_ID "ESP_test_omar"
-//#define TOKEN "opwjtE7INx2vPtXl@w"
 
 //-------- Customise the above values --------
+
+// Start of IoT Settings:____________________________
 
 char server[] = ORG ".messaging.internetofthings.ibmcloud.com";
 char authMethod[] = "use-token-auth";
@@ -62,6 +43,24 @@ int publishInterval = 5000;
 long lastPublishMillis;
 
 // End of IoT Settings:____________________________
+
+//---------Dust Sensor---------
+int dust_pin = D1;
+unsigned long duration;
+unsigned long starttime;
+unsigned long sampletime_ms = 5000;//sample 30s ;
+unsigned long lowpulseoccupancy = 0;
+float ratio = 0;
+float concentration = 0;
+
+//---------DHT Sensor---------
+#include <DHT.h>
+#define DHTPIN D2
+#define DHTTYPE DHT11
+DHT dht(DHTPIN, DHTTYPE);
+float humidity = 0;
+float temperature = 0;
+float heat_index = 0;
 
 void setup() {
     Serial.begin(115200);
