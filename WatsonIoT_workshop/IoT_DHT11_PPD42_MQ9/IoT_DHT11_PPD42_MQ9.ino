@@ -11,10 +11,11 @@
 #include <ESP8266WiFi.h>
 
 //-------- Customise these values -----------
-const char* ssid = "example_1"; // WiFi network name
-const char* password = "example_2"; // WiFi password
 
-#define ORG "example_3" // This is your Org ID, not your Org name.
+const char* ssid = "example_1";
+const char* password = "example_2";
+
+#define ORG "example_3"
 #define DEVICE_TYPE "example_4"
 #define DEVICE_ID "example_5"
 #define TOKEN "example_6"
@@ -39,7 +40,7 @@ void callback(char* topic, byte* payload, unsigned int payloadLength);
 WiFiClient wifiClient;
 PubSubClient client(server, 1883, callback, wifiClient);
 
-int publishInterval = 5000;
+int publishInterval = 1000;
 long lastPublishMillis;
 
 // End of IoT Settings:____________________________
@@ -47,8 +48,8 @@ long lastPublishMillis;
 //---------Dust Sensor---------
 int dust_pin = D1;
 unsigned long duration;
-unsigned long starttime;
-unsigned long sampletime_ms = 5000;//sample 30s ;
+//unsigned long starttime;
+//unsigned long sampletime_ms = 5000;//sample 30s ;
 unsigned long lowpulseoccupancy = 0;
 float ratio = 0;
 float concentration = 0;
@@ -62,6 +63,9 @@ float humidity = 0;
 float temperature = 0;
 float heat_index = 0;
 
+//---------MQ9 Sensor---------
+float gas_volt = 0;
+
 void setup() {
     Serial.begin(115200);
 
@@ -73,7 +77,7 @@ void setup() {
     
     //---------Dust Sensor---------
     pinMode(dust_pin,INPUT);
-    starttime = millis();//get the current time;
+    //starttime = millis();//get the current time;
 
     //---------DHT Sensor---------
     dht.begin();
@@ -93,24 +97,30 @@ void loop() {
         //---------Dust Sensor---------
         ratio = lowpulseoccupancy/(publishInterval*10.0);  // Integer percentage 0=>100
         concentration = 1.1*pow(ratio,3)-3.8*pow(ratio,2)+520*ratio+0.62; // using spec sheet curve
-        Serial.print("Low pulse occupancy:" + String(lowpulseoccupancy));
         Serial.println();
-        Serial.print("Ratio: " + String(ratio));
-        Serial.println();
+        Serial.println("Low pulse occupancy:" + String(lowpulseoccupancy));
+        Serial.println("Ratio: " + String(ratio));
         Serial.println("Concentration: " + String(concentration));
         Serial.println();
         lowpulseoccupancy = 0;
         //---------DHT Sensor---------
         Serial.println("Humidity: " + String(humidity));
-        Serial.println();
         Serial.println("Temperature: " + String(temperature));
-        Serial.println();
         Serial.println("Heat index: " + String(heat_index));
+        Serial.println();
+        //---------MQ9 Sensor---------
+        gas_volt = analogRead(A0);
+        gas_volt = 5.0*gas_volt/1024;//converting from digital to volts.
+        Serial.println("Gas sensor voltage: " + String(gas_volt));
         Serial.println();
       publishData();
       lastPublishMillis = millis();
     }
-    delay(10);  
+    //delay(10);
+    if (!client.loop()) {
+      mqttConnect();
+      initManagedDevice();
+    } 
 }
 
 // Start of IoT Functions:____________________________
@@ -128,6 +138,7 @@ void wifiConnect() {
   }
 
 void mqttConnect() {
+  delay(500);
   if (!!!client.connected()) {
     Serial.print("Reconnecting MQTT client to "); Serial.println(server);
     while (!!!client.connect(clientId, authMethod, token)) {
@@ -178,16 +189,17 @@ void initManagedDevice() {
 void publishData() {
   while (WiFi.status() != WL_CONNECTED) {
     Serial.print("Disconnected! \n Trying to connect again.");
+    delay(500);
     wifiConnect();
   }
-  String payload = "{\"d\":{\"concentration\":";
+  String payload = "{\"d\":{\"dust\":";
   payload += String(concentration);
-  payload += ",\"humidity\":";
+  payload += ",\"hum\":";
   payload += String(humidity);
-  payload += ",\"temperature\":";
+  payload += ",\"temp\":";
   payload += String(temperature);
-  payload += ",\"heat_index\":";
-  payload += String(heat_index);
+  payload += ",\"gas_volt\":";
+  payload += String(gas_volt);
   payload += "}}";
 
   Serial.println();
@@ -199,8 +211,8 @@ void publishData() {
     }
   else {
     Serial.println("Publish FAILED");
-    mqttConnect();
-    initManagedDevice();
+    //mqttConnect();
+    //initManagedDevice();
     }
   }
 
