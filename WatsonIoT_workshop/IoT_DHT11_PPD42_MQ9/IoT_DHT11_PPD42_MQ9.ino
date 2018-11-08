@@ -12,13 +12,15 @@
 
 //-------- Customise these values -----------
 
-const char* ssid = "example_1";
-const char* password = "example_2";
+ const char* ssid = "INECC_VISITANTES";
+ const char* password = "1n3cC_Vs1T@nTs.2019";
+//const char* ssid = "iPhone";
+//const char* password = "znp4dpvt3thb1";
 
-#define ORG "example_3"
-#define DEVICE_TYPE "example_4"
-#define DEVICE_ID "example_5"
-#define TOKEN "example_6"
+#define ORG "w0xz9w"
+#define DEVICE_TYPE "waterdroid"
+#define DEVICE_ID "ESP_test"
+#define TOKEN "4eFmfb8w6h@5s4rUh*"
 
 //-------- Customise the above values --------
 
@@ -138,12 +140,19 @@ void wifiConnect() {
   }
 
 void mqttConnect() {
-  delay(500);
+  delay(1000);
   if (!!!client.connected()) {
     Serial.print("Reconnecting MQTT client to "); Serial.println(server);
     while (!!!client.connect(clientId, authMethod, token)) {
       Serial.print("*");
-      delay(500);
+      while (WiFi.status() != WL_CONNECTED) {
+        delay(4000);
+        Serial.println("Disconnected from:");
+        Serial.print(ssid);
+        Serial.print("Reconnecting.");
+        wifiConnect();
+        }
+      delay(1000);
       }
     Serial.println();
     }
